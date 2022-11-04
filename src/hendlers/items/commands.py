@@ -1,10 +1,10 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import ParseMode, ReplyKeyboardRemove
+from aiogram.types import ParseMode, ReplyKeyboardRemove, InputFile, InputMediaPhoto
 import aiogram.utils.markdown as md
 from .state_classes import *
-from keyboards import *
+from src.keyboards import *
 from aiogram import types
-from loader import dp, db, bot
+from src.loader import dp, db, bot
 
 
 @dp.message_handler(commands=['start', 'menu'])
@@ -25,6 +25,38 @@ async def answer_start(message: types.Message):
 @dp.message_handler(text='Hide')
 async def answer_hide(message: types.Message):
     await message.answer(text=f'Use /menu pr /start commands to show menu again', reply_markup=ReplyKeyboardRemove())
+
+
+@dp.message_handler(text=['all_items'])
+@dp.message_handler(text='all_items')
+async def all_items(message: types.Message):
+    first_item_info = db.select_item_info(id=1)
+    first_item_info = first_item_info[0]
+    _, name, quantity, photo_path = first_item_info
+    item_text = f"Item name = {name}" \
+                f"\nQuantity = {quantity}"
+    photo = InputFile(path_or_bytesio=photo_path)
+    await message.answer_photo(photo=photo,
+                               caption=item_text,
+                               reply_markup=get_item_inline_keyboard())
+
+
+@dp.callback_query_handler(navigation_data_callback.filter(fro_data='items'))
+async def see_new_item(call: types.CallbackQuery):
+    # print(call)
+    # print(call.data)
+    current_item_id = int(call.data.split(':')[-1])
+    first_item_info = db.select_item_info(id=current_item_id)
+    first_item_info = first_item_info[0]
+    _, name, quantity, photo_path = first_item_info
+    item_text = f"Item name = {name}" \
+                f"\nQuantity = {quantity}"
+    photo = InputFile(path_or_bytesio=photo_path)
+    await bot.edit_message_media(media=InputMediaPhoto(media=photo,
+                                                       caption=item_text),
+                                 chat_id=call.message.chat.id,
+                                 message_id=call.message.message_id,
+                                 reply_markup=get_item_inline_keyboard(id=current_item_id))
 
 
 @dp.message_handler(commands='new_table_items')

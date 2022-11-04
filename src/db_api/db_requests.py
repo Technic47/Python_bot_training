@@ -38,6 +38,7 @@ class DB:
         id int NOT NULL,
         name text,
         quantity int,
+        photo_path text,
         PRIMARY KEY (id))"""
         self.execute(sql, commit=True)
 
@@ -47,10 +48,10 @@ class DB:
         params = (id, phone)
         self.execute(sql, params, commit=True)
 
-    def add_item(self, id: int, quantity: int, name: str = None):
+    def add_item(self, id: int, quantity: int = 0, name: str = None, photo_path: str = ''):
         sql = """
-        INSERT INTO Items(id, name, quantity) VALUES(?, ?, ?)"""
-        params = (id, name, quantity)
+        INSERT INTO Items(id, name, quantity, photo_path) VALUES(?, ?, ?, ?)"""
+        params = (id, name, quantity, photo_path)
         self.execute(sql, params, commit=True)
 
     def select_user_info(self, **kwargs) -> list:
@@ -97,6 +98,10 @@ class DB:
     def update_item_number(self, id: int, quantity: int):
         sql = "UPDATE Items SET quantity=? WHERE id=?"
         return self.execute(sql, params=(quantity, id), commit=True)
+
+    def get_item_count(self) -> int:
+        sql = "SELECT * FROM Items"
+        return len(self.execute(sql, fetchall=True))
 
     @staticmethod
     def format_args(sql, params: dict) -> tuple:
