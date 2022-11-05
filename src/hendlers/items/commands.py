@@ -2,9 +2,9 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import ParseMode, ReplyKeyboardRemove, InputFile, InputMediaPhoto
 import aiogram.utils.markdown as md
 from .state_classes import *
-from src.keyboards import *
+from keyboards import *
 from aiogram import types
-from src.loader import dp, db, bot
+from loader import dp, db, bot
 
 
 @dp.message_handler(commands=['start', 'menu'])
@@ -27,8 +27,8 @@ async def answer_hide(message: types.Message):
     await message.answer(text=f'Use /menu pr /start commands to show menu again', reply_markup=ReplyKeyboardRemove())
 
 
-@dp.message_handler(text=['all_items'])
-@dp.message_handler(text='all_items')
+@dp.message_handler(text=['all_items', 'All_items'])
+@dp.message_handler(text=['all_items', 'All_items'])
 async def all_items(message: types.Message):
     first_item_info = db.select_item_info(id=1)
     first_item_info = first_item_info[0]
@@ -41,10 +41,10 @@ async def all_items(message: types.Message):
                                reply_markup=get_item_inline_keyboard())
 
 
-@dp.callback_query_handler(navigation_data_callback.filter(fro_data='items'))
+@dp.callback_query_handler(navigation_data_callback.filter(for_data='items'))
 async def see_new_item(call: types.CallbackQuery):
     # print(call)
-    # print(call.data)
+    print(call.data)
     current_item_id = int(call.data.split(':')[-1])
     first_item_info = db.select_item_info(id=current_item_id)
     first_item_info = first_item_info[0]
@@ -90,20 +90,29 @@ async def item_name(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=add.state3)
-async def item_quantity(message: types.Message, state: FSMContext):
+async def item_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['state3'] = message.text
+        print(data['state3'])
+    await add.next()
+    await message.reply('Enter photo directory:')
+    await add.state4.set()
+
+
+@dp.message_handler(state=add.state4)
+async def item_quantity(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['state4'] = message.text
+        print(data['state4'])
         await bot.send_message(
             message.from_user.id,
             md.text(
-                md.text(f'id:', data['state1']),
-                md.text(f'name:', data['state2']),
-                md.text(f'quantity:', data['state3']),
                 md.text(f'Created'),
                 sep='\n',
             ),
             parse_mode=ParseMode.MARKDOWN)
-        db.add_item(id=int(data['state1']), name=str(data['state2']), quantity=int(data['state3']))
+        db.add_item(id=int(data['state1']), name=str(data['state2']), quantity=int(data['state3']),
+                    photo_path=str(data['state4']))
     await state.finish()
 
 

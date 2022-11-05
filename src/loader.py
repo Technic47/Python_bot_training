@@ -1,9 +1,8 @@
-import sqlite3
-
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram import Bot, Dispatcher
 from config import TOKEN
 from db_api import DB
+import sqlite3
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
@@ -19,6 +18,13 @@ except Exception as e:
 
 try:
     db.create_table_items()
+except sqlite3.OperationalError as e:
+    print(e)
+except Exception as e:
+    print(e)
+
+try:
+    db.create_table_basket()
 except sqlite3.OperationalError as e:
     print(e)
 except Exception as e:

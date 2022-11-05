@@ -32,6 +32,15 @@ class DB:
         PRIMARY KEY (id))"""
         self.execute(sql, commit=True)
 
+    def create_table_basket(self, user_id):
+        sql = """
+        CREATE TABLE Basket(
+        user_id int NOT NULL,
+        basket text,
+        PRIMARY KEY (user_id))"""
+        self.execute(sql, commit=True)
+        self.add_basket(user_id, "")
+
     def create_table_items(self):
         sql = """
         CREATE TABLE Items(
@@ -48,6 +57,18 @@ class DB:
         params = (id, phone)
         self.execute(sql, params, commit=True)
 
+    def add_basket(self, user_id: int, basket: str = None):
+        sql = """
+        INSERT INTO Basket(user_id, basket) VALUES(?, ?)"""
+        params = (user_id, basket)
+        self.execute(sql, params, commit=True)
+
+    def update_user_basket(self, user_id: int, item_id: str):
+        old_item_id = self.select_user_basket(user_id=user_id)[0]
+        new_item_id = f'{old_item_id} + " " + {item_id}'
+        sql = "UPDATE Basket SET item_id=? WHERE id=?"
+        return self.execute(sql, params=(new_item_id, user_id), commit=True)
+
     def add_item(self, id: int, quantity: int = 0, name: str = None, photo_path: str = ''):
         sql = """
         INSERT INTO Items(id, name, quantity, photo_path) VALUES(?, ?, ?, ?)"""
@@ -56,6 +77,11 @@ class DB:
 
     def select_user_info(self, **kwargs) -> list:
         sql = 'SELECT * FROM Users WHERE '
+        sql, params = self.format_args(sql, kwargs)
+        return self.execute(sql, params=params, fetchall=True)
+
+    def select_user_basket(self, **kwargs) -> list:
+        sql = 'SELECT * FROM Basket WHERE '
         sql, params = self.format_args(sql, kwargs)
         return self.execute(sql, params=params, fetchall=True)
 
