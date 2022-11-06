@@ -32,14 +32,13 @@ class DB:
         PRIMARY KEY (id))"""
         self.execute(sql, commit=True)
 
-    def create_table_basket(self, user_id):
+    def create_table_basket(self):
         sql = """
         CREATE TABLE Basket(
         user_id int NOT NULL,
         basket text,
         PRIMARY KEY (user_id))"""
         self.execute(sql, commit=True)
-        self.add_basket(user_id, "")
 
     def create_table_items(self):
         sql = """
@@ -57,17 +56,35 @@ class DB:
         params = (id, phone)
         self.execute(sql, params, commit=True)
 
-    def add_basket(self, user_id: int, basket: str = None):
+    def add_basket(self, user_id: int, basket: str = ""):
         sql = """
         INSERT INTO Basket(user_id, basket) VALUES(?, ?)"""
         params = (user_id, basket)
         self.execute(sql, params, commit=True)
 
     def update_user_basket(self, user_id: int, item_id: str):
-        old_item_id = self.select_user_basket(user_id=user_id)[0]
-        new_item_id = f'{old_item_id} + " " + {item_id}'
-        sql = "UPDATE Basket SET item_id=? WHERE id=?"
-        return self.execute(sql, params=(new_item_id, user_id), commit=True)
+        old_basket = self.select_user_basket(user_id=user_id)[0][1]
+        print('old = ' + old_basket)
+        new_basket = f'{old_basket}' + " " + f'{item_id}'
+        print('new = ' + new_basket)
+        sql = "UPDATE Basket SET basket=? WHERE user_id=?"
+        return self.execute(sql, params=(new_basket, user_id), commit=True)
+
+    def add_to_basket(self, user_id: int, item_id: str):
+        print(self.check_basket_exist(user_id=user_id))
+        # self.delete_all_baskets()
+        if not self.check_basket_exist(user_id):
+            print("No user basket")
+            self.add_basket(user_id)
+        self.update_user_basket(user_id, item_id)
+
+    def check_basket_exist(self, user_id) -> bool:
+        check = False
+        users = self.select_user_basket(user_id=user_id)
+        for i in users:
+            if i[0] == user_id:
+                check = True
+        return check
 
     def add_item(self, id: int, quantity: int = 0, name: str = None, photo_path: str = ''):
         sql = """
@@ -110,6 +127,9 @@ class DB:
 
     def delete_all_items(self):
         self.execute("DELETE FROM Items WHERE True", commit=True)
+
+    def delete_all_baskets(self):
+        self.execute("DELETE FROM Basket WHERE True", commit=True)
 
     def drop_all(self):
         self.execute("DROP TABLE Users", commit=True)

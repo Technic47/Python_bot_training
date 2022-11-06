@@ -59,6 +59,16 @@ async def see_new_item(call: types.CallbackQuery):
                                  reply_markup=get_item_inline_keyboard(id=current_item_id))
 
 
+@dp.callback_query_handler(navigation_data_callback.filter(for_data='basket'))
+async def add_to_basket(call: types.CallbackQuery):
+    print(call.data)
+    user_id = call.message.from_user.id
+    item_id = int(call.data.split(':')[-1])
+    db.add_to_basket(user_id, item_id)
+    await bot.answer_callback_query(callback_query_id=call.id, text="Added to your basket",
+                                    show_alert=False)
+
+
 @dp.message_handler(commands='new_table_items')
 async def create_table_items(message: types.Message):
     db.create_table_items()

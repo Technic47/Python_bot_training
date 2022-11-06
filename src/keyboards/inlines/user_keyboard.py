@@ -8,7 +8,7 @@ def get_item_inline_keyboard(id: int = 1) -> InlineKeyboardMarkup:
     left_id = id - 1
     right_id = id + 1
     to_basket = InlineKeyboardButton(text='to basket',
-                                     callback_data=navigation_data_callback.new(for_data='items', id=id))
+                                     callback_data=navigation_data_callback.new(for_data='basket', id=id))
     if id == 1:
         btn = InlineKeyboardButton(text='>>>',
                                    callback_data=navigation_data_callback.new(for_data='items', id=right_id))
