@@ -9,7 +9,7 @@ from loader import dp, db, bot
 
 @dp.message_handler(commands=['start', 'menu'])
 async def answer_start(message: types.Message):
-    await message.answer(text=f'Hi!\nNice to see you!', reply_markup=commands_root_keyboard)
+    await message.answer(text=f'Hi!\nNice to see you!', reply_markup=basket_keyboard)
 
 
 @dp.message_handler(commands='items')
@@ -44,7 +44,7 @@ async def all_items(message: types.Message):
 @dp.callback_query_handler(navigation_data_callback.filter(for_data='items'))
 async def see_new_item(call: types.CallbackQuery):
     # print(call)
-    print(call.data)
+    # print(call.data)
     current_item_id = int(call.data.split(':')[-1])
     first_item_info = db.select_item_info(id=current_item_id)
     first_item_info = first_item_info[0]
@@ -62,11 +62,28 @@ async def see_new_item(call: types.CallbackQuery):
 @dp.callback_query_handler(navigation_data_callback.filter(for_data='basket'))
 async def add_to_basket(call: types.CallbackQuery):
     print(call.data)
-    user_id = call.message.from_user.id
+    user_id = call.from_user.id
     item_id = int(call.data.split(':')[-1])
     db.add_to_basket(user_id, item_id)
     await bot.answer_callback_query(callback_query_id=call.id, text="Added to your basket",
                                     show_alert=False)
+
+
+@dp.message_handler(text=['My_basket', 'my_basket'])
+@dp.message_handler(commands=['My_basket', 'my_basket'])
+async def show_basket(message: types.Message):
+    user_id = message.from_user.id
+    basket_items = db.show_basket(user_id)
+    for i in basket_items:
+        await message.answer(text=f'{i} = {basket_items.get(i)}', reply_markup=basket_keyboard)
+
+
+@dp.message_handler(text=['Clear_basket', 'clear_basket'])
+@dp.message_handler(commands=['Clear_basket', 'clear_basket'])
+async def show_basket(message: types.Message):
+    user_id = message.from_user.id
+    db.clear_basket(user_id)
+    await message.answer(text=f'Your basket is cleared!', reply_markup=basket_keyboard)
 
 
 @dp.message_handler(commands='new_table_items')

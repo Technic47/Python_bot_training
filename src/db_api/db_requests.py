@@ -64,9 +64,7 @@ class DB:
 
     def update_user_basket(self, user_id: int, item_id: str):
         old_basket = self.select_user_basket(user_id=user_id)[0][1]
-        print('old = ' + old_basket)
         new_basket = f'{old_basket}' + " " + f'{item_id}'
-        print('new = ' + new_basket)
         sql = "UPDATE Basket SET basket=? WHERE user_id=?"
         return self.execute(sql, params=(new_basket, user_id), commit=True)
 
@@ -85,6 +83,24 @@ class DB:
             if i[0] == user_id:
                 check = True
         return check
+
+    def show_basket(self, user_id: int) -> dict:
+        user_basket = self.select_user_basket(user_id=user_id)[0][1].split(' ')
+        user_basket = user_basket[1:]
+        basket_items = {}
+        for i in user_basket:
+            item = self.select_item_info(id=i)
+            item = item[0][1]
+            if item in basket_items:
+                basket_items[item] += 1
+            else:
+                basket_items[item] = 1
+        return basket_items
+
+    def clear_basket(self, user_id: int) -> None:
+        clear_basket = f''
+        sql = "UPDATE Basket SET basket=? WHERE user_id=?"
+        return self.execute(sql, params=(clear_basket, user_id), commit=True)
 
     def add_item(self, id: int, quantity: int = 0, name: str = None, photo_path: str = ''):
         sql = """
