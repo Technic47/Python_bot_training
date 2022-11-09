@@ -66,6 +66,23 @@ async def add_to_basket(call: types.CallbackQuery):
                                     show_alert=False)
 
 
+@dp.message_handler(text=['Buy', 'buy'])
+@dp.message_handler(commands=['Buy', 'buy'])
+async def show_basket(message: types.Message):
+    user_id = message.from_user.id
+    basket_items = db.show_basket(user_id)
+    print(basket_items)
+    for i in basket_items:
+        item_data = db.select_info('Items', name=i)
+        item_quantity_old = item_data[0][2]
+        item_quantity_new = item_quantity_old - basket_items.get(i)
+        item_id = item_data[0][0]
+        print(item_data, item_quantity_new, item_id)
+        db.update_item_number(item_id, item_quantity_new)
+    db.clear_basket(user_id)
+    await message.answer(text='Thank you for your purchase!', reply_markup=basket_keyboard)
+
+
 @dp.message_handler(text=['My_basket', 'my_basket'])
 @dp.message_handler(commands=['My_basket', 'my_basket'])
 async def show_basket(message: types.Message):

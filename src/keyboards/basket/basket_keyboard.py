@@ -7,6 +7,9 @@ basket_keyboard = ReplyKeyboardMarkup(
             KeyboardButton(text='My_basket'),
         ],
         [
+            KeyboardButton(text='Buy')
+        ],
+        [
             KeyboardButton(text='Clear_basket')
         ]
     ],
