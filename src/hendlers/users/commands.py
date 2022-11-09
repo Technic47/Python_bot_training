@@ -114,7 +114,7 @@ async def show_info(message: types.Message):
 async def id_find(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['state1'] = message.text
-        await message.answer(text=f"{db.select_user_info(id=int(data['state1']))}")
+        await message.answer(text=f"{db.select_info('Users', id=int(data['state1']))}")
     await state.finish()
 
 
@@ -128,7 +128,7 @@ async def delete_user(message: types.Message):
 async def id_find_del(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['state1'] = message.text
-        db.delete_user(id=int(data['state1']))
+        db.delete('Users', id=int(data['state1']))
         await message.answer(text=f"User with id {data['state1']} deleted.")
     await state.finish()
 
@@ -136,17 +136,17 @@ async def id_find_del(message: types.Message, state: FSMContext):
 @dp.message_handler(commands='show_users')
 async def show_users(message: types.Message):
     await message.answer(text='id, phone')
-    for item in db.select_all_users():
+    for item in db.select_all('Users'):
         await message.answer(text=item)
 
 
 @dp.message_handler(commands='del_all_users')
 async def delete_all(message: types.Message):
-    db.delete_all()
+    db.delete_all('Users')
     await message.answer(text='All users are deleted')
 
 
 @dp.message_handler(commands='del_tab_users')
 async def drop_all(message: types.Message):
-    db.drop_all()
+    db.drop_all('Users')
     await message.answer(text='Table "Users" deleted')

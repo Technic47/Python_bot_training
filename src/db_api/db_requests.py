@@ -63,33 +63,30 @@ class DB:
         self.execute(sql, params, commit=True)
 
     def update_user_basket(self, user_id: int, item_id: str):
-        old_basket = self.select_user_basket(user_id=user_id)[0][1]
+        old_basket = self.select_info('Basket', user_id=user_id)[0][1]
         new_basket = f'{old_basket}' + " " + f'{item_id}'
         sql = "UPDATE Basket SET basket=? WHERE user_id=?"
         return self.execute(sql, params=(new_basket, user_id), commit=True)
 
     def add_to_basket(self, user_id: int, item_id: str):
-        print(self.check_basket_exist(user_id=user_id))
-        # self.delete_all_baskets()
         if not self.check_basket_exist(user_id):
-            print("No user basket")
             self.add_basket(user_id)
         self.update_user_basket(user_id, item_id)
 
     def check_basket_exist(self, user_id) -> bool:
         check = False
-        users = self.select_user_basket(user_id=user_id)
+        users = self.select_info('Basket', user_id=user_id)
         for i in users:
             if i[0] == user_id:
                 check = True
         return check
 
     def show_basket(self, user_id: int) -> dict:
-        user_basket = self.select_user_basket(user_id=user_id)[0][1].split(' ')
+        user_basket = self.select_info('Basket', user_id=user_id)[0][1].split(' ')
         user_basket = user_basket[1:]
         basket_items = {}
         for i in user_basket:
-            item = self.select_item_info(id=i)
+            item = self.select_info('Items', id=i)
             item = item[0][1]
             if item in basket_items:
                 basket_items[item] += 1
@@ -108,50 +105,74 @@ class DB:
         params = (id, name, quantity, photo_path)
         self.execute(sql, params, commit=True)
 
-    def select_user_info(self, **kwargs) -> list:
-        sql = 'SELECT * FROM Users WHERE '
+    def select_info(self, table: str, **kwargs) -> list:
+        sql = f'SELECT * FROM {table} WHERE '
         sql, params = self.format_args(sql, kwargs)
         return self.execute(sql, params=params, fetchall=True)
 
-    def select_user_basket(self, **kwargs) -> list:
-        sql = 'SELECT * FROM Basket WHERE '
-        sql, params = self.format_args(sql, kwargs)
-        return self.execute(sql, params=params, fetchall=True)
+    # def select_user_info(self, **kwargs) -> list:
+    #     sql = 'SELECT * FROM Users WHERE '
+    #     sql, params = self.format_args(sql, kwargs)
+    #     return self.execute(sql, params=params, fetchall=True)
+    #
+    # def select_user_basket(self, **kwargs) -> list:
+    #     sql = 'SELECT * FROM Basket WHERE '
+    #     sql, params = self.format_args(sql, kwargs)
+    #     return self.execute(sql, params=params, fetchall=True)
+    #
+    # def select_item_info(self, **kwargs) -> list:
+    #     sql = 'SELECT * FROM Items WHERE '
+    #     sql, params = self.format_args(sql, kwargs)
+    #     return self.execute(sql, params=params, fetchall=True)
 
-    def select_item_info(self, **kwargs) -> list:
-        sql = 'SELECT * FROM Items WHERE '
-        sql, params = self.format_args(sql, kwargs)
-        return self.execute(sql, params=params, fetchall=True)
-
-    def select_all_users(self) -> tuple:
-        sql = "SELECT * FROM Users"
+    def select_all(self, table: str):
+        sql = f"SELECT * FROM {table}"
         return self.execute(sql, fetchall=True)
 
-    def select_all_items(self) -> tuple:
-        sql = "SELECT * FROM Items"
-        return self.execute(sql, fetchall=True)
+    # def select_all_users(self) -> tuple:
+    #     sql = "SELECT * FROM Users"
+    #     return self.execute(sql, fetchall=True)
 
-    def delete_user(self, **kwargs):
-        sql = "DELETE FROM Users WHERE "
+    # def select_all_items(self) -> tuple:
+    #     sql = "SELECT * FROM Items"
+    #     return self.execute(sql, fetchall=True)
+
+    # def get_item_count(self) -> int:
+    #     sql = "SELECT * FROM Items"
+    #     return len(self.execute(sql, fetchall=True))
+
+    def delete(self, table: str, **kwargs):
+        sql = f"DELETE FROM {table} WHERE "
         sql, params = self.format_args(sql, params=kwargs)
         return self.execute(sql, params=params, commit=True)
 
-    def delete_item(self, **kwargs):
-        sql = "DELETE FROM Items WHERE "
-        sql, params = self.format_args(sql, params=kwargs)
-        return self.execute(sql, params=params, commit=True)
+    # def delete_user(self, **kwargs):
+    #     sql = "DELETE FROM Users WHERE "
+    #     sql, params = self.format_args(sql, params=kwargs)
+    #     return self.execute(sql, params=params, commit=True)
+    #
+    # def delete_item(self, **kwargs):
+    #     sql = "DELETE FROM Items WHERE "
+    #     sql, params = self.format_args(sql, params=kwargs)
+    #     return self.execute(sql, params=params, commit=True)
 
-    def delete_all_items(self):
-        self.execute("DELETE FROM Items WHERE True", commit=True)
+    def delete_all(self, table: str):
+        self.execute(f"DELETE FROM {table} WHERE True", commit=True)
 
-    def delete_all_baskets(self):
-        self.execute("DELETE FROM Basket WHERE True", commit=True)
+    # def delete_all_items(self):
+    #     self.execute("DELETE FROM Items WHERE True", commit=True)
+    #
+    # def delete_all_baskets(self):
+    #     self.execute("DELETE FROM Basket WHERE True", commit=True)
 
-    def drop_all(self):
-        self.execute("DROP TABLE Users", commit=True)
+    def drop_all(self, table: str):
+        self.execute(f"DROP TABLE {table}", commit=True)
 
-    def drop_all_items(self):
-        self.execute("DROP TABLE Items", commit=True)
+    # def drop_all(self):
+    #     self.execute("DROP TABLE Users", commit=True)
+    #
+    # def drop_all_items(self):
+    #     self.execute("DROP TABLE Items", commit=True)
 
     def update_user_phone(self, id: int, phone: str):
         sql = "UPDATE Users SET phone=? WHERE id=?"
@@ -160,10 +181,6 @@ class DB:
     def update_item_number(self, id: int, quantity: int):
         sql = "UPDATE Items SET quantity=? WHERE id=?"
         return self.execute(sql, params=(quantity, id), commit=True)
-
-    def get_item_count(self) -> int:
-        sql = "SELECT * FROM Items"
-        return len(self.execute(sql, fetchall=True))
 
     @staticmethod
     def format_args(sql, params: dict) -> tuple:

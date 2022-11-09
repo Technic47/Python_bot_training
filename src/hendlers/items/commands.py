@@ -30,7 +30,7 @@ async def answer_hide(message: types.Message):
 @dp.message_handler(text=['all_items', 'All_items'])
 @dp.message_handler(text=['all_items', 'All_items'])
 async def all_items(message: types.Message):
-    first_item_info = db.select_item_info(id=1)
+    first_item_info = db.select_info('Items', id=1)
     first_item_info = first_item_info[0]
     _, name, quantity, photo_path = first_item_info
     item_text = f"Item name = {name}" \
@@ -43,10 +43,8 @@ async def all_items(message: types.Message):
 
 @dp.callback_query_handler(navigation_data_callback.filter(for_data='items'))
 async def see_new_item(call: types.CallbackQuery):
-    # print(call)
-    # print(call.data)
     current_item_id = int(call.data.split(':')[-1])
-    first_item_info = db.select_item_info(id=current_item_id)
+    first_item_info = db.select_info('Items', id=current_item_id)
     first_item_info = first_item_info[0]
     _, name, quantity, photo_path = first_item_info
     item_text = f"Item name = {name}" \
@@ -61,7 +59,6 @@ async def see_new_item(call: types.CallbackQuery):
 
 @dp.callback_query_handler(navigation_data_callback.filter(for_data='basket'))
 async def add_to_basket(call: types.CallbackQuery):
-    print(call.data)
     user_id = call.from_user.id
     item_id = int(call.data.split(':')[-1])
     db.add_to_basket(user_id, item_id)
@@ -120,7 +117,6 @@ async def item_name(message: types.Message, state: FSMContext):
 async def item_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['state3'] = message.text
-        print(data['state3'])
     await add.next()
     await message.reply('Enter photo directory:')
     await add.state4.set()
@@ -130,7 +126,6 @@ async def item_name(message: types.Message, state: FSMContext):
 async def item_quantity(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['state4'] = message.text
-        print(data['state4'])
         await bot.send_message(
             message.from_user.id,
             md.text(
@@ -177,7 +172,7 @@ async def show_item(message: types.Message):
 async def id_find(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['state1'] = message.text
-        await message.answer(text=f"{db.select_item_info(id=int(data['state1']))}")
+        await message.answer(text=f"{db.select_info('Items', id=int(data['state1']))}")
     await state.finish()
 
 
@@ -191,7 +186,7 @@ async def delete_item(message: types.Message):
 async def id_find_del(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['state1'] = message.text
-        db.delete_item(id=int(data['state1']))
+        db.delete('Items', id=int(data['state1']))
         await message.answer(text=f"Item with id {data['state1']} deleted.")
     await state.finish()
 
@@ -199,17 +194,17 @@ async def id_find_del(message: types.Message, state: FSMContext):
 @dp.message_handler(commands='show_items')
 async def show_items(message: types.Message):
     await message.answer(text='id, name, quantity')
-    for item in db.select_all_items():
+    for item in db.select_all('Items'):
         await message.answer(text=item)
 
 
 @dp.message_handler(commands='del_all_items')
 async def del_all_items(message: types.Message):
-    db.delete_all_items()
+    db.delete_all('Items')
     await message.answer(text='All items are deleted')
 
 
 @dp.message_handler(commands='del_tab_items')
 async def del_tab_items(message: types.Message):
-    db.drop_all_items()
+    db.drop_all('Items')
     await message.answer(text='Table "Items" deleted')

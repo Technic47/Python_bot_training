@@ -14,7 +14,7 @@ def get_item_inline_keyboard(id: int = 1) -> InlineKeyboardMarkup:
                                    callback_data=navigation_data_callback.new(for_data='items', id=right_id))
         item_inline_keyboard.add(btn)
         item_inline_keyboard.row(to_basket)
-    elif id == db.get_item_count():
+    elif id == len(db.select_all('Items')):
         btn = InlineKeyboardButton(text='<<<',
                                    callback_data=navigation_data_callback.new(for_data='items', id=left_id))
         item_inline_keyboard.add(btn)
