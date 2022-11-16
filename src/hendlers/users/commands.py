@@ -9,18 +9,13 @@ from loader import dp, db, bot
 
 @dp.message_handler(commands=['start', 'menu'])
 async def answer_start(message: types.Message):
-    await message.answer(text=f'Hi!\nNice to see you!', reply_markup=basket_keyboard)
+    await message.answer(text=f'Hi!\nNice to see you!', reply_markup=start_keyboard)
 
 
 @dp.message_handler(text=['admin', 'Admin'])
 @dp.message_handler(commands=['admin', 'Admin'])
 async def answer_admin(message: types.Message):
     await message.answer(text=f'Lets work with items.', reply_markup=commands_root_keyboard)
-
-
-@dp.message_handler(commands='items')
-async def answer_start(message: types.Message):
-    await message.answer(text=f'Lets work with items.', reply_markup=commands_items_keyboard)
 
 
 @dp.message_handler(commands='users')

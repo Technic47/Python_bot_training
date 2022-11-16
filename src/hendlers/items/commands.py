@@ -9,17 +9,12 @@ from loader import dp, db, bot
 
 @dp.message_handler(commands=['start', 'menu'])
 async def answer_start(message: types.Message):
-    await message.answer(text=f'Hi!\nNice to see you!', reply_markup=basket_keyboard)
+    await message.answer(text=f'Hi!\nNice to see you!', reply_markup=start_keyboard)
 
 
 @dp.message_handler(commands='items')
 async def answer_start(message: types.Message):
     await message.answer(text=f'Lets work with items.', reply_markup=commands_items_keyboard)
-
-
-@dp.message_handler(commands='users')
-async def answer_start(message: types.Message):
-    await message.answer(text=f'Lets work with users.', reply_markup=commands_users_keyboard)
 
 
 @dp.message_handler(text='Hide')
@@ -57,47 +52,44 @@ async def see_new_item(call: types.CallbackQuery):
                                  reply_markup=get_item_inline_keyboard(id=current_item_id))
 
 
-@dp.callback_query_handler(navigation_data_callback.filter(for_data='basket'))
-async def add_to_basket(call: types.CallbackQuery):
-    user_id = call.from_user.id
-    item_id = int(call.data.split(':')[-1])
-    db.add_to_basket(user_id, item_id)
-    await bot.answer_callback_query(callback_query_id=call.id, text="Added to your basket",
-                                    show_alert=False)
+@dp.callback_query_handler(item_count_callback.filter(target='item_plus'))
+async def plus_item(call: types.CallbackQuery):
+    current_count = int(call.data.split(':')[-1])
+    current_item_id = int(call.data.split(':')[-2])
+    item_info = db.select_info('Items', id=current_item_id)
+    item_info = item_info[0]
+    _, name, count, photo_path = item_info
+    if current_count != count:
+        current_count += 1
+        item_text = f'Item name = {name}\n' \
+                    f'Items count: {count}'
+        photo = InputFile(path_or_bytesio=photo_path)
+        await bot.edit_message_media(media=InputMediaPhoto(media=photo,
+                                                           caption=item_text),
+                                     chat_id=call.message.chat.id,
+                                     message_id=call.message.message_id,
+                                     reply_markup=get_item_inline_keyboard(id=current_item_id,
+                                                                           current_count=current_count))
 
 
-@dp.message_handler(text=['Buy', 'buy'])
-@dp.message_handler(commands=['Buy', 'buy'])
-async def show_basket(message: types.Message):
-    user_id = message.from_user.id
-    basket_items = db.show_basket(user_id)
-    print(basket_items)
-    for i in basket_items:
-        item_data = db.select_info('Items', name=i)
-        item_quantity_old = item_data[0][2]
-        item_quantity_new = item_quantity_old - basket_items.get(i)
-        item_id = item_data[0][0]
-        print(item_data, item_quantity_new, item_id)
-        db.update_item_number(item_id, item_quantity_new)
-    db.clear_basket(user_id)
-    await message.answer(text='Thank you for your purchase!', reply_markup=basket_keyboard)
-
-
-@dp.message_handler(text=['My_basket', 'my_basket'])
-@dp.message_handler(commands=['My_basket', 'my_basket'])
-async def show_basket(message: types.Message):
-    user_id = message.from_user.id
-    basket_items = db.show_basket(user_id)
-    for i in basket_items:
-        await message.answer(text=f'{i} = {basket_items.get(i)}', reply_markup=basket_keyboard)
-
-
-@dp.message_handler(text=['Clear_basket', 'clear_basket'])
-@dp.message_handler(commands=['Clear_basket', 'clear_basket'])
-async def show_basket(message: types.Message):
-    user_id = message.from_user.id
-    db.clear_basket(user_id)
-    await message.answer(text=f'Your basket is cleared!', reply_markup=basket_keyboard)
+@dp.callback_query_handler(item_count_callback.filter(target='item_minus'))
+async def plus_item(call: types.CallbackQuery):
+    current_count = int(call.data.split(':')[-1])
+    current_item_id = int(call.data.split(':')[-2])
+    if current_count != 1:
+        current_count -= 1
+        item_info = db.select_info('Items', id=current_item_id)
+        item_info = item_info[0]
+        _, name, count, photo_path = item_info
+        item_text = f'Item name = {name}\n' \
+                    f'Items count: {count}'
+        photo = InputFile(path_or_bytesio=photo_path)
+        await bot.edit_message_media(media=InputMediaPhoto(media=photo,
+                                                           caption=item_text),
+                                     chat_id=call.message.chat.id,
+                                     message_id=call.message.message_id,
+                                     reply_markup=get_item_inline_keyboard(id=current_item_id,
+                                                                           current_count=current_count))
 
 
 @dp.message_handler(commands='new_table_items')
