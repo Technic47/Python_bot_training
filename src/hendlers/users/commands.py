@@ -12,6 +12,12 @@ async def answer_start(message: types.Message):
     await message.answer(text=f'Hi!\nNice to see you!', reply_markup=start_keyboard)
 
 
+@dp.message_handler(commands=['test'])
+async def answer_menu_command(message: types.Message, user_basket: tuple[int | str]):
+    await message.answer(text='middleware test'
+                              f'\n That`s what it gives us: {user_basket}')
+
+
 @dp.message_handler(text=['admin', 'Admin'])
 @dp.message_handler(commands=['admin', 'Admin'])
 async def answer_admin(message: types.Message):

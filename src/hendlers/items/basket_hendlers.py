@@ -7,8 +7,8 @@ from states import BuyerState
 
 @dp.message_handler(text='My_basket')
 @dp.message_handler(commands='My_basket')
-async def show_basket(message: Message):
-    user_basket = db.select_user_basket(user_id=message.from_user.id)[1]
+async def show_basket(message: Message, get_user_basket):
+    user_basket = get_user_basket[1]
     if user_basket != '':
         user_basket = [item_data.split(':') for item_data in user_basket.split()]
         text = 'Basket: '
@@ -22,7 +22,7 @@ async def show_basket(message: Message):
         await message.answer(text=text)
 
 
-@dp.callback_query_handler(item_count_callback.filter(target='basket'))
+@dp.callback_query_handler(item_count_callback.filter(target='to_basket'))
 async def add_item_basket(call: CallbackQuery):
     current_count = int(call.data.split(':')[-1])
     current_item_id = call.data.split(':')[-2]
@@ -73,8 +73,9 @@ async def get_time(message: Message, state: FSMContext):
 
 
 @dp.message_handler(state=BuyerState.wait_name)
-async def get_name(message: Message, state: FSMContext):
-    user_basket = db.select_user_basket(user_id=message.from_user.id)[1]
+async def get_name(message: Message, state: FSMContext, get_user_basket):
+    raw_data = get_user_basket
+    user_basket = raw_data[1]
     user_basket = [item_data.split(':') for item_data in user_basket.split()]
     data = await state.get_data()
     text = f'Order\n' \
@@ -85,7 +86,12 @@ async def get_name(message: Message, state: FSMContext):
     for item_id, item_count in user_basket:
         _, name, _, _ = db.select_info('Items', id=item_id)[0]
         text += f'\n{name}: {item_count}'
+
+    for item_id in user_basket:
+        current_count = db.select_info('Items', id=item_id[0])[0][2]
+        new_count = current_count - int(item_id[1])
+        db.update_item_number(id=item_id[0], quantity=new_count)
+
     db.update_user_basket(user_id=message.from_user.id, basket='')
-    await message.answer(text=text,
-                         reply_markup=basket_keyboard)
+    await message.answer(text=text)
     await state.reset_state()

@@ -41,7 +41,7 @@ def get_item_inline_keyboard(id: int = 1, current_count: int = 0) -> InlineKeybo
                                                       current_count=f'{current_count}')))
     item_inline_keyboard.row(InlineKeyboardButton(text='Add to basket',
                                                   callback_data=item_count_callback.new(
-                                                      target='basket',
+                                                      target='to_basket',
                                                       id=id,
                                                       current_count=f'{current_count}'
                                                   )))

@@ -5,6 +5,7 @@ from .state_classes import *
 from keyboards import *
 from aiogram import types
 from loader import dp, db, bot
+from aiogram.utils.markdown import hbold, hitalic, hunderline, hstrikethrough, hlink
 
 
 @dp.message_handler(commands=['start', 'menu'])
@@ -19,7 +20,8 @@ async def answer_start(message: types.Message):
 
 @dp.message_handler(text='Hide')
 async def answer_hide(message: types.Message):
-    await message.answer(text=f'Use /menu pr /start commands to show menu again', reply_markup=ReplyKeyboardRemove())
+    await message.answer(text=f'Use {hbold("/menu")} or {hbold("/start")} commands to show menu again',
+                         reply_markup=ReplyKeyboardRemove())
 
 
 @dp.message_handler(text=['all_items', 'All_items'])

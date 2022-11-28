@@ -57,6 +57,7 @@ class DB:
         self.execute(sql, params, commit=True)
 
     def add_basket(self, user_id: int, basket: str = ''):
+        self.add_user(id=user_id, phone='')
         sql = """
         INSERT INTO Basket(user_id, start) VALUES(?, ?)"""
         params = (user_id, basket)
@@ -67,6 +68,7 @@ class DB:
         sql, params = self.format_args(sql, kwargs)
         data = self.execute(sql, params=params, fetchone=True)
         if data is None:
+            self.add_user(id=kwargs['user_id'], phone='')
             self.add_basket(user_id=kwargs['user_id'])
             data = (kwargs['user_id'], '')
         return data
@@ -74,36 +76,6 @@ class DB:
     def update_user_basket(self, user_id: int, basket: str):
         sql = "UPDATE Basket SET basket=? WHERE user_id=?"
         return self.execute(sql, params=(basket, user_id), commit=True)
-        # old_basket = self.select_info('Basket', user_id=user_id)[0][1]
-        # new_basket = f'{old_basket}' + " " + f'{item_id}'
-        # sql = "UPDATE Basket SET start=? WHERE user_id=?"
-        # return self.execute(sql, params=(new_basket, user_id), commit=True)
-
-    def add_to_basket(self, user_id: int, item_id: str):
-        if not self.check_basket_exist(user_id):
-            self.add_basket(user_id)
-        self.update_user_basket(user_id, item_id)
-
-    def check_basket_exist(self, user_id) -> bool:
-        check = False
-        users = self.select_info('Basket', user_id=user_id)
-        for i in users:
-            if i[0] == user_id:
-                check = True
-        return check
-
-    def show_basket(self, user_id: int) -> dict:
-        user_basket = self.select_info('Basket', user_id=user_id)[0][1].split(' ')
-        user_basket = user_basket[1:]
-        basket_items = {}
-        for i in user_basket:
-            item = self.select_info('Items', id=i)
-            item = item[0][1]
-            if item in basket_items:
-                basket_items[item] += 1
-            else:
-                basket_items[item] = 1
-        return basket_items
 
     def clear_basket(self, user_id: int) -> None:
         clear_basket = f''
