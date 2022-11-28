@@ -1,19 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b47702c1-e520-4b28-aee8-7b5a899ae46c" name="Changes" comment="fsm adn basket rebuild">
-      <change afterPath="$PROJECT_DIR$/src/hendlers/users/money_handler.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/middlewares/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/middlewares/db_mw.py" afterDir="false" />
+    <list default="true" id="b47702c1-e520-4b28-aee8-7b5a899ae46c" name="Changes" comment="item counter updates after order placement.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/db_api/DataBase/shop_db.db" beforeDir="false" afterPath="$PROJECT_DIR$/src/db_api/DataBase/shop_db.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db_api/db_requests.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/db_api/db_requests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hendlers/items/basket_hendlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hendlers/items/basket_hendlers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hendlers/items/commands.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hendlers/items/commands.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hendlers/users/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hendlers/users/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hendlers/users/commands.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hendlers/users/commands.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hendlers/users/money_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/hendlers/users/money_handler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/keyboards/inlines/user_keyboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/keyboards/inlines/user_keyboard.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -136,7 +127,14 @@
       <option name="project" value="LOCAL" />
       <updated>1668619372661</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="item counter updates after order placement.">
+      <created>1669637183705</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1669637183705</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -155,7 +153,8 @@
     <MESSAGE value="show basket works + keyboards rebuilt" />
     <MESSAGE value="refactor." />
     <MESSAGE value="fsm adn basket rebuild" />
-    <option name="LAST_COMMIT_MESSAGE" value="fsm adn basket rebuild" />
+    <MESSAGE value="item counter updates after order placement." />
+    <option name="LAST_COMMIT_MESSAGE" value="item counter updates after order placement." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -169,11 +168,6 @@
           <url>file://$PROJECT_DIR$/src/keyboards/inlines/user_keyboard.py</url>
           <line>41</line>
           <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/keyboards/inlines/user_keyboard.py</url>
-          <line>24</line>
-          <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

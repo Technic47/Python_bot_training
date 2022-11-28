@@ -20,12 +20,14 @@ async def add_money(message: types.Message):
                                "amount": 10000
                            }])
 
-
-@dp.pre_checkout_query_handler()
-async def process_pre_checkout(pre_checkout_query: types.PreCheckoutQuery):
-    bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
-
-
-@dp.message_handler(content_types=ContentType.SUCCESSFUL_PAYMENT)
-async def process_pay(message: types.Message):
-    pass
+#
+# @dp.pre_checkout_query_handler()
+# async def process_pre_checkout(pre_checkout_query: types.PreCheckoutQuery):
+#     bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
+#
+#
+# @dp.message_handler(content_types=ContentType.SUCCESSFUL_PAYMENT)
+# async def process_pay(message: types.Message):
+#     if message.successful_payment.invoice_payload == "add_money_100":
+#         await message.answer(text="Operation successfull",
+#                              reply_markup=commands_keyboard)

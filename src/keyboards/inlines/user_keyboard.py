@@ -9,20 +9,20 @@ def get_item_inline_keyboard(id: int = 1, current_count: int = 0) -> InlineKeybo
     right_id = id + 1
 
     if id == 1:
-        btn = InlineKeyboardButton(text='>>>',
+        btn = InlineKeyboardButton(text='👉',
                                    callback_data=navigation_data_callback.new(for_data='items', id=right_id))
         item_inline_keyboard.add(btn)
     elif id == len(db.select_all('Items')):
-        btn = InlineKeyboardButton(text='<<<',
+        btn = InlineKeyboardButton(text='👈',
                                    callback_data=navigation_data_callback.new(for_data='items', id=left_id))
         item_inline_keyboard.add(btn)
     else:
-        btn_left = InlineKeyboardButton(text='<<<',
+        btn_left = InlineKeyboardButton(text='👈',
                                         callback_data=navigation_data_callback.new(for_data='items', id=left_id))
-        btn_right = InlineKeyboardButton(text='>>>',
+        btn_right = InlineKeyboardButton(text='👉',
                                          callback_data=navigation_data_callback.new(for_data='items', id=right_id))
         item_inline_keyboard.row(btn_left, btn_right)
-    item_inline_keyboard.row(InlineKeyboardButton(text='-',
+    item_inline_keyboard.row(InlineKeyboardButton(text='➖',
                                                   callback_data=item_count_callback.new(
                                                       target='item_minus',
                                                       id=id,
@@ -34,7 +34,7 @@ def get_item_inline_keyboard(id: int = 1, current_count: int = 0) -> InlineKeybo
                                                       id=id,
                                                       current_count=f'{current_count}'
                                                   )),
-                             InlineKeyboardButton(text='+',
+                             InlineKeyboardButton(text='➕',
                                                   callback_data=item_count_callback.new(
                                                       target='item_plus',
                                                       id=id,
